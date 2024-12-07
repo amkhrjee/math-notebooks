@@ -27,6 +27,8 @@ The mathematical expression for the fourier transform is...daunting to say the l
 
 But what it actually does is very simple and intuitive under the hood.
 
+I've taken help from [www.thefouriertransform.com](https://www.thefouriertransform.com/).
+
 We begin by defining what is a "transform".
 
 ### What is a transform?
@@ -1565,10 +1567,10 @@ version = "1.4.1+1"
 # ╟─441d7ad0-114a-4fe9-a009-cbc6f32ce308
 # ╟─0487e6f3-1e2c-4a81-a82e-d70c9a6ec890
 # ╠═34c392fd-c52a-42e4-bbd7-6d79ca641291
-# ╠═97bd737c-136e-46a2-b3f0-f5ff2eaf9866
+# ╟─97bd737c-136e-46a2-b3f0-f5ff2eaf9866
 # ╟─b176aefb-9076-479f-89e2-4761a30c7f88
 # ╟─e5d6380b-6b61-47fc-92f0-64f61026cb72
-# ╠═7df97895-d900-45c4-a818-5ecad47dcb27
+# ╟─7df97895-d900-45c4-a818-5ecad47dcb27
 # ╟─2f1b94a3-34ff-4c1d-a3b7-6335eca52825
 # ╠═02bd8dea-6fd9-4112-a074-43389537727d
 # ╟─00c7c0a5-d9f9-4f2b-8dd1-3dd0423cd6e0
