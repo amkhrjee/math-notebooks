@@ -259,6 +259,27 @@ begin
 	plot!(saw_xs, [saw_g(t, saw_count) for t in saw_xs], label="fourier")
 end
 
+# ╔═╡ c7e02320-5bff-405e-a6c6-d9ecd2e7bf57
+md"""
+Now, say $f(t) = e^{-t} \sin t$
+
+The Fourier transform for this function will be:
+
+$X(\omega) = \int_{-\infty}^{\infty} f(t)e^{-i\omega t} = \dfrac{1}{2 - \omega^2 + 2i\omega}$
+"""
+
+# ╔═╡ f4527773-ff33-480d-9758-e8bc26e5787f
+begin
+	ts_ = [t for t in range(0, 10, 200)]
+	plot(ts_, [exp(-t)*sin(t) for t in ts_], label="", title=L"Time domain plot for $e^{-t}\sin t$")
+end
+
+# ╔═╡ 34c6490e-a81b-4fc9-ab10-38d3a67cb379
+begin
+	fs_ = [t for t in range(-10, 10, 200)]
+	plot(fs_, [abs(1/(2 - f^2 + 2*im*f)) for f in fs_], label="", title=L"Frequency domain plot for $e^{-t}\sin t$")
+end
+
 # ╔═╡ 3cb66851-b6fa-476f-aeeb-2aa724dc70fa
 md"""
 Now that you have a practical intuition of what the Fourier transform does, you should watch these $\text{3Blue1Brown}$ videos.
@@ -1489,7 +1510,10 @@ version = "1.4.1+1"
 # ╠═bcd79e59-9af0-49e6-9246-15e889e35f7c
 # ╟─f322a907-85e8-4ff5-9106-51d0ff61a70a
 # ╠═1ce1243e-f1c3-4a55-a9e1-f56078a8a309
-# ╟─7453ed78-7d38-485c-b7f9-e4a7c0f53bb4
+# ╠═7453ed78-7d38-485c-b7f9-e4a7c0f53bb4
+# ╟─c7e02320-5bff-405e-a6c6-d9ecd2e7bf57
+# ╟─f4527773-ff33-480d-9758-e8bc26e5787f
+# ╟─34c6490e-a81b-4fc9-ab10-38d3a67cb379
 # ╟─3cb66851-b6fa-476f-aeeb-2aa724dc70fa
 # ╟─87f78325-9def-4eac-ab8b-3ff72f18667b
 # ╟─def53162-c99a-4841-982b-ad4144d3033e
