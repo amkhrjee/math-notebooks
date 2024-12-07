@@ -17,7 +17,7 @@ macro bind(def, element)
 end
 
 # ╔═╡ 6d2c0639-dec3-4e49-9633-f4172138c89a
-using Plots, PlutoUI, DSP, Latexify
+using Plots, PlutoUI, DSP, LaTeXStrings
 
 # ╔═╡ 02f8c420-b29a-11ef-107c-3d2804b1f85d
 md"""
@@ -137,7 +137,7 @@ $a_m = 0$ for all m, $b_n = \dfrac{2}{\pi n}$ for n odd and $0$ otherwise.
 """
 
 # ╔═╡ b176aefb-9076-479f-89e2-4761a30c7f88
-@bind count Slider(1:100)
+@bind count Slider(1:1000)
 
 # ╔═╡ e5d6380b-6b61-47fc-92f0-64f61026cb72
 begin
@@ -146,17 +146,122 @@ begin
 	plot!(ts, [g(t, count) for t in ts], label="fourier")
 end
 
+# ╔═╡ 7df97895-d900-45c4-a818-5ecad47dcb27
+md"""
+### Complex Coefficients
+
+Using complex numbers makes things easier to understand and more mathematically elegant. Again, we want to rewrite a periodic function $f(t)$ with period $T$ with the infinite sum of sinusoidal functions. In this case, we will use the complex exponential function as the basis.
+
+$g(t) = \sum_{n = - \infty}^{\infty} c_n e^{i\dfrac{2\pi nt}{T}}$
+
+The unknown Fourier coefficients are now then $c_n$, where $n$ is an integer between negative infinity and positive infinity.
+
+$c_n = \dfrac{1}{T} \int_{0}^{T} f(t) e^{-i\dfrac{2\pi nt}{T}}dt$
+
+Thus, working through the math, we can find 
+
+$c_0 = \dfrac{1}{2}$
+
+$c_n = \dfrac{1}{i\pi n}, n = \pm 1, \pm 3, \pm 5, ...$
+
+$c_n = 0, n = \pm 2, \pm 4, \pm 6, ...$
+
+"""
+
+# ╔═╡ 2f1b94a3-34ff-4c1d-a3b7-6335eca52825
+@bind k Slider(1:1000)
+
+# ╔═╡ 02bd8dea-6fd9-4112-a074-43389537727d
+begin
+	plot(ts, y, label="", xlabel="Time (s)", ylabel="Amplitude")
+	new_g(t, count) = 0.5 + sum([(1/(t*π)im) for n in range(1, count) if n % 2 != 0])
+	plot!(ts, [g(t, k) for t in ts], label="fourier")
+end
+
+# ╔═╡ 00c7c0a5-d9f9-4f2b-8dd1-3dd0423cd6e0
+md"""
+### Fourier series representation of the cosine function
+
+$f(t) = \cos (4\pi t)$
+
+"""
+
+# ╔═╡ 515426cf-f4d0-483c-98c6-558a4688e22a
+plot([x for x in range(-1, 1, 200)], [cos(4π*x) for x in range(-1, 1, 200)], label="")
+
+# ╔═╡ b1a970f9-6eaf-4950-bfcd-e27938c0de9a
+md"""
+Here $T = 0.5$
+
+We know 
+
+$c_n = \dfrac{1}{T} \int_{0}^{T} f(t) e^{-i\dfrac{2\pi nt}{T}}dt = \dfrac{1}{0.5} \int_{0}^{0.5} \cos (4\pi t) e^{-i\dfrac{2\pi nt}{0.5}}dt$
+
+Via euler's identity, $\cos (t) = \dfrac{e^{it} + e^{-it}}{2}$
+
+Thus,
+
+$c_n = 2 \int_{0}^{0.5} \dfrac{e^{4\pi t} + e^{-4\pi t}}{2} e^{-i4\pi nt}dt = \int_{0}^{0.5} e^{4\pi t (1 - n)}dt + \int_{0}^{0.5} e^{-4\pi t (1 + n)}dt$
+
+When $n \neq 1$, the first integral becomes zero. When $n = 1$, $c_1 = \int_{0}^{0.5} e^{4\pi t (1 - 1)}dt = \int_{0}^{0.5} dt = 0.5$
+
+Similarly, the second integral will be zero except for $n = -1$, for which we can find out the value to be $c_{-1} = 0.5$
+
+Thus
+
+$g(t) = \sum_{n = - \infty}^{\infty} c_n e^{i\dfrac{2\pi nt}{T}} = c_1 e^{i\dfrac{2\pi t}{T}} + c_{-1} e^{-i\dfrac{2\pi t}{T}} = 0.5 (e^{i4\pi t} + e^{-i4\pi t}) = \cos (4\pi t) = f(t)$
+
+"""
+
+# ╔═╡ 1c365ba0-fe21-4dd5-8f0e-53c7b0ed9b12
+plot([x for x in range(-1, 1, 200)], [0.5 * real((exp(4π * x * im) + exp(-4π * x * im))) for x in range(-1, 1, 200)], label=L"$ 0.5 (e^{i4\pi t} + e^{-i4\pi t})$")
+
+# ╔═╡ 078e5d7b-6eb5-454b-8a9c-df17d715c976
+md"""
+### Fourier Series Representation of the Saw function
+
+$f(t) = A\dfrac{t}{T}, 0 \leq t \leq T$
+
+"""
+
+# ╔═╡ bd10e745-edda-4602-86c4-340e6318385e
+@bind A Slider(1:5)
+
+# ╔═╡ 1c332879-b11f-4001-90cb-a5d1d7e9803b
+@bind T Slider(1:5)
+
+# ╔═╡ bcd79e59-9af0-49e6-9246-15e889e35f7c
+plot([x for x in range(0, 20, 200)], [A*(x%T/T) for x in range(0, 20, 200)], label="")
+
+# ╔═╡ f322a907-85e8-4ff5-9106-51d0ff61a70a
+md"""
+
+We can find out $c_n = \dfrac{iA}{2\pi n}, n \neq 0$ and $c_0 = \dfrac{A}{2}$
+
+"""
+
+# ╔═╡ 1ce1243e-f1c3-4a55-a9e1-f56078a8a309
+@bind saw_count Slider(1:30)
+
+# ╔═╡ 7453ed78-7d38-485c-b7f9-e4a7c0f53bb4
+begin
+	saw_xs = [x for x in range(0, 20, 200)]
+	plot(saw_xs, [A*(x%T/T) for x in range(0, 20, 200)] , label="", xlabel="Time (s)", ylabel="Amplitude")
+	saw_g(t, count) = A/2 + sum([real((A*im/(2π*n))*exp(2π*n*t*im/T)) for n in range(-count, count) if n != 0])
+	plot!(saw_xs, [saw_g(t, saw_count) for t in saw_xs], label="fourier")
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
-Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 DSP = "~0.7.10"
-Latexify = "~0.16.5"
+LaTeXStrings = "~1.4.0"
 Plots = "~1.40.9"
 PlutoUI = "~0.7.23"
 """
@@ -167,7 +272,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "ee2744744d7a611a7922d5e039e10d5c14651bb5"
+project_hash = "6fcba14263e504a1320bd5439cba02837742045a"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1460,8 +1565,22 @@ version = "1.4.1+1"
 # ╟─441d7ad0-114a-4fe9-a009-cbc6f32ce308
 # ╟─0487e6f3-1e2c-4a81-a82e-d70c9a6ec890
 # ╠═34c392fd-c52a-42e4-bbd7-6d79ca641291
-# ╟─97bd737c-136e-46a2-b3f0-f5ff2eaf9866
-# ╠═b176aefb-9076-479f-89e2-4761a30c7f88
+# ╠═97bd737c-136e-46a2-b3f0-f5ff2eaf9866
+# ╟─b176aefb-9076-479f-89e2-4761a30c7f88
 # ╟─e5d6380b-6b61-47fc-92f0-64f61026cb72
+# ╠═7df97895-d900-45c4-a818-5ecad47dcb27
+# ╟─2f1b94a3-34ff-4c1d-a3b7-6335eca52825
+# ╠═02bd8dea-6fd9-4112-a074-43389537727d
+# ╟─00c7c0a5-d9f9-4f2b-8dd1-3dd0423cd6e0
+# ╟─515426cf-f4d0-483c-98c6-558a4688e22a
+# ╟─b1a970f9-6eaf-4950-bfcd-e27938c0de9a
+# ╠═1c365ba0-fe21-4dd5-8f0e-53c7b0ed9b12
+# ╟─078e5d7b-6eb5-454b-8a9c-df17d715c976
+# ╠═bd10e745-edda-4602-86c4-340e6318385e
+# ╠═1c332879-b11f-4001-90cb-a5d1d7e9803b
+# ╠═bcd79e59-9af0-49e6-9246-15e889e35f7c
+# ╟─f322a907-85e8-4ff5-9106-51d0ff61a70a
+# ╠═1ce1243e-f1c3-4a55-a9e1-f56078a8a309
+# ╟─7453ed78-7d38-485c-b7f9-e4a7c0f53bb4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
