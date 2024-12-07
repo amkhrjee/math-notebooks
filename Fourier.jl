@@ -275,6 +275,16 @@ html"""
 
 """
 
+# ╔═╡ 5f83474e-b793-452e-ae90-934c33e6521e
+md"""
+> *A picture is worth a thousand words.*
+"""
+
+# ╔═╡ 96140214-201a-44df-b9a1-7c85868359db
+html"""
+<img src="https://tikz.net/files/fourier_series-011.png" />
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1483,5 +1493,7 @@ version = "1.4.1+1"
 # ╟─3cb66851-b6fa-476f-aeeb-2aa724dc70fa
 # ╟─87f78325-9def-4eac-ab8b-3ff72f18667b
 # ╟─def53162-c99a-4841-982b-ad4144d3033e
+# ╟─5f83474e-b793-452e-ae90-934c33e6521e
+# ╟─96140214-201a-44df-b9a1-7c85868359db
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
