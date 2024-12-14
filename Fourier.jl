@@ -19,6 +19,9 @@ end
 # ╔═╡ 6d2c0639-dec3-4e49-9633-f4172138c89a
 using Plots, PlutoUI, LaTeXStrings
 
+# ╔═╡ 5d872aa6-acf4-4756-bc8c-c08cdb3c2b2b
+using WAV, FFTW, OffsetArrays
+
 # ╔═╡ 02f8c420-b29a-11ef-107c-3d2804b1f85d
 md"""
 # Fourier Transform
@@ -54,7 +57,7 @@ html"""
 begin
 	xs = [x for x in range(0, 2*π, 200)]
 	ys = sin.(2*π*f*xs) 
-	plot(xs, ys, title="a single sine wave", label="sin(2πft)")
+	plot(xs, ys, title="a single sine wave", label="sin(2πft)", x_lims=(0, 4))
 end
 
 # ╔═╡ 023add3b-de8a-400b-b3a2-ecf12cba8d23
@@ -306,17 +309,114 @@ html"""
 <img src="https://tikz.net/files/fourier_series-011.png" />
 """
 
+# ╔═╡ 7ccb1b3b-5453-4148-ab86-e494c25118c6
+md"""
+## Disrete Fourier Transform
+
+These are two awesome videos for DFT
+"""
+
+# ╔═╡ 328db4d9-b881-4e7b-be26-d5af2be13ee1
+html"""
+<iframe width="560" height="315" src="https://www.youtube.com/embed/nmgFG7PUHfo?si=-bYvwEnysJwbLScT&amp;start=780" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+"""
+
+# ╔═╡ e3c6aa6d-6739-424c-b9c5-9a5b99f3aa16
+html"""
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mkGsMWi_j4Q?si=zUjDN8B3hl2eelwx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+"""
+
+# ╔═╡ e1b83462-887a-4e01-9806-4d1a7185d007
+begin
+	files = download.([
+		"https://www.dropbox.com/s/3zygy6n72prdv9x/Sound1.wav?dl=0",
+		"https://www.dropbox.com/s/qxb79tw6jhillym/Sound2.wav?dl=0",
+		"https://www.dropbox.com/s/evo14tvdujkcssc/Sound3.wav?dl=0",
+		"https://www.dropbox.com/s/sfxpt3erqelc7jt/Sound4.wav?dl=0",
+		"https://www.dropbox.com/s/xlavzvtoaxe0oe7/Sound1234.wav?dl=0",
+	])
+end
+
+# ╔═╡ 68b9d8da-5095-4dc8-900b-cc6b5926bc3c
+begin
+	sounds = wavread.(files)
+	signals = [sound[1][:, 1] for sound in sounds]
+end
+
+# ╔═╡ 04e475b8-fd37-4683-b3c3-8d0f1410ee1b
+begin
+	plot(signals[1], x_lims=(20000, 22000), label="Sound 1")
+	plot!(signals[2], x_lims=(20000, 22000), label="Sound 2")
+	plot!(signals[3], x_lims=(20000, 22000), label="Sound 3")
+	plot!(signals[4], x_lims=(20000, 22000), label="Sound 4")
+end
+
+# ╔═╡ 407cbf25-57a6-472b-917e-ca4e6cd4690f
+plot(signals[5], x_lims=(20000, 22000), label="Combined")
+
+# ╔═╡ 1ec49868-35dd-40dc-9ca4-1cccb0982b83
+signal_ffts = fft.(signals)
+
+# ╔═╡ 00a68a81-4210-4f93-b1f0-6846a135802b
+begin
+	plot(abs.(signal_ffts[1]), x_lims=(1, 1000), label="Sound 1", title="Frequency Spectrum")
+	plot!(abs.(signal_ffts[2]), x_lims=(1, 1000), label="Sound 2")
+	plot!(abs.(signal_ffts[3]), x_lims=(1, 1000), label="Sound 3")
+	plot!(abs.(signal_ffts[4]), x_lims=(1, 1000), label="Sound 4")
+end
+
+# ╔═╡ 42d5cfcc-cedd-4089-b08e-3f0a82ce58e9
+plot(abs.(signal_ffts[5]), x_lims=(1, 1000), label="Combined", title="Frequency Spectrum")
+
+# ╔═╡ 96466ee8-6baa-4db4-ab33-a1214ed966c2
+md"""
+### Writing our own DFT function!
+"""
+
+# ╔═╡ 5b5353f8-9570-485a-8a3e-44923ccd3662
+function DFT(signal)
+	N = length(signal)
+	# zeta = exp(-2π * im / N)
+	zeta_powers = OffsetArray([
+		exp(-2π * im * n / N)
+		for n in 0:(N-1)
+	], 0:(N-1))
+	[
+		# Sum
+		sum((
+			signal[n + 1] * zeta_powers[(n * f) % N]
+			for n in 0:(N-1) 
+		))
+		for f in 0:(N-1)
+	]
+end
+
+# ╔═╡ cd4b51ca-5c5d-4f19-bbf0-7d679be8346e
+signal = signals[1][1:10000]
+
+# ╔═╡ 97b75751-d499-499a-b91b-52e39d60518b
+signal_dft = DFT(signal) # takes ~530 millisecs
+
+# ╔═╡ 2ee48630-9b0a-4c98-9cae-43718d12d00d
+signal_fft = fft(signal) # takes ~700 microsecs 
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+WAV = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
 
 [compat]
+FFTW = "~1.8.0"
 LaTeXStrings = "~1.4.0"
+OffsetArrays = "~1.14.1"
 Plots = "~1.40.9"
 PlutoUI = "~0.7.23"
+WAV = "~1.2.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -325,7 +425,21 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "d0a6b9c3789928b82cc0c6f558337a2c6b2e0f93"
+project_hash = "4757787344baaa432d3260c2fe942ed5643f6a3d"
+
+[[deps.AbstractFFTs]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "d92ad398961a3ed262d8bf04a1a2b8340f915fef"
+uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
+version = "1.5.0"
+
+    [deps.AbstractFFTs.extensions]
+    AbstractFFTsChainRulesCoreExt = "ChainRulesCore"
+    AbstractFFTsTestExt = "Test"
+
+    [deps.AbstractFFTs.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -497,6 +611,28 @@ git-tree-sha1 = "466d45dc38e15794ec7d5d63ec03d776a9aff36e"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.4.4+1"
 
+[[deps.FFTW]]
+deps = ["AbstractFFTs", "FFTW_jll", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
+git-tree-sha1 = "4820348781ae578893311153d69049a93d05f39d"
+uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+version = "1.8.0"
+
+[[deps.FFTW_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "4d81ed14783ec49ce9f2e168208a12ce1815aa25"
+uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
+version = "3.3.10+1"
+
+[[deps.FileIO]]
+deps = ["Pkg", "Requires", "UUIDs"]
+git-tree-sha1 = "2dd20384bf8c6d411b5c7370865b1e9b26cb2ea3"
+uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+version = "1.16.6"
+weakdeps = ["HTTP"]
+
+    [deps.FileIO.extensions]
+    HTTPExt = "HTTP"
+
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 version = "1.11.0"
@@ -601,6 +737,12 @@ git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
 version = "0.2.5"
 
+[[deps.IntelOpenMP_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "10bd689145d2c3b2a9844005d01087cc1194e79e"
+uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
+version = "2024.2.1+0"
+
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
@@ -679,6 +821,11 @@ version = "0.16.5"
     DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
+
+[[deps.LazyArtifacts]]
+deps = ["Artifacts", "Pkg"]
+uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+version = "1.11.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -788,6 +935,12 @@ git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.1.0"
 
+[[deps.MKL_jll]]
+deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "oneTBB_jll"]
+git-tree-sha1 = "f046ccd0c6db2832a9f639e2c669c6fe867e5f4f"
+uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
+version = "2024.2.0+0"
+
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
 git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
@@ -838,6 +991,17 @@ version = "1.0.2"
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.2.0"
+
+[[deps.OffsetArrays]]
+git-tree-sha1 = "1a27764e945a152f7ca7efa04de513d473e9542e"
+uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+version = "1.14.1"
+
+    [deps.OffsetArrays.extensions]
+    OffsetArraysAdaptExt = "Adapt"
+
+    [deps.OffsetArrays.weakdeps]
+    Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1192,6 +1356,12 @@ git-tree-sha1 = "2f0486047a07670caad3a81a075d2e518acc5c59"
 uuid = "a44049a8-05dd-5a78-86c9-5fde0876e88c"
 version = "1.3.243+0"
 
+[[deps.WAV]]
+deps = ["Base64", "FileIO", "Libdl", "Logging"]
+git-tree-sha1 = "7e7e1b4686995aaf4ecaaf52f6cd824fa6bd6aa5"
+uuid = "8149f6b0-98f6-5db9-b78f-408fbbb8ef88"
+version = "1.2.0"
+
 [[deps.Wayland_jll]]
 deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
 git-tree-sha1 = "7558e29847e99bc3f04d6569e82d0f5c54460703"
@@ -1459,6 +1629,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
 version = "1.59.0+0"
 
+[[deps.oneTBB_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "7d0ea0f4895ef2f5cb83645fa689e52cb55cf493"
+uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
+version = "2021.12.0+0"
+
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
@@ -1487,10 +1663,10 @@ version = "1.4.1+1"
 # ╟─02f8c420-b29a-11ef-107c-3d2804b1f85d
 # ╟─08e04206-2e32-429c-b176-2e006de6dde5
 # ╠═6d2c0639-dec3-4e49-9633-f4172138c89a
-# ╟─c7dbb396-a221-4ff4-bad9-4074e6b93d8e
+# ╠═c7dbb396-a221-4ff4-bad9-4074e6b93d8e
 # ╟─c928af19-3541-4231-a559-87eff63009c4
 # ╟─023add3b-de8a-400b-b3a2-ecf12cba8d23
-# ╟─38723231-123e-4207-8356-20fed4c147c4
+# ╠═38723231-123e-4207-8356-20fed4c147c4
 # ╟─441d7ad0-114a-4fe9-a009-cbc6f32ce308
 # ╟─0487e6f3-1e2c-4a81-a82e-d70c9a6ec890
 # ╟─34c392fd-c52a-42e4-bbd7-6d79ca641291
@@ -1519,5 +1695,21 @@ version = "1.4.1+1"
 # ╟─def53162-c99a-4841-982b-ad4144d3033e
 # ╟─5f83474e-b793-452e-ae90-934c33e6521e
 # ╟─96140214-201a-44df-b9a1-7c85868359db
+# ╟─7ccb1b3b-5453-4148-ab86-e494c25118c6
+# ╟─328db4d9-b881-4e7b-be26-d5af2be13ee1
+# ╟─e3c6aa6d-6739-424c-b9c5-9a5b99f3aa16
+# ╠═5d872aa6-acf4-4756-bc8c-c08cdb3c2b2b
+# ╟─e1b83462-887a-4e01-9806-4d1a7185d007
+# ╟─68b9d8da-5095-4dc8-900b-cc6b5926bc3c
+# ╟─04e475b8-fd37-4683-b3c3-8d0f1410ee1b
+# ╟─407cbf25-57a6-472b-917e-ca4e6cd4690f
+# ╟─1ec49868-35dd-40dc-9ca4-1cccb0982b83
+# ╟─00a68a81-4210-4f93-b1f0-6846a135802b
+# ╟─42d5cfcc-cedd-4089-b08e-3f0a82ce58e9
+# ╟─96466ee8-6baa-4db4-ab33-a1214ed966c2
+# ╠═5b5353f8-9570-485a-8a3e-44923ccd3662
+# ╟─cd4b51ca-5c5d-4f19-bbf0-7d679be8346e
+# ╠═97b75751-d499-499a-b91b-52e39d60518b
+# ╠═2ee48630-9b0a-4c98-9cae-43718d12d00d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
