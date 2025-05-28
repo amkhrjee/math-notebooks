@@ -13,7 +13,7 @@ This repo contains Pluto notebooks of my maths musings!
 
 ![](./demo/demo2.gif)
 
-#### Convolution
+#### Convolution with different kernels
 
 ![](./demo/demo3.gif)
 
