@@ -2,6 +2,8 @@
 
 This repo contains Pluto notebooks of my maths musings! 
 
+![](./demo/demo.gif)
+
 ### How to view?
 
 If you have [Julia](https://julialang.org/) and [Pluto](https://plutojl.org) installed on your system, you can simply copy-paste the link to any of the Julia files into your Pluto notebook console. 
