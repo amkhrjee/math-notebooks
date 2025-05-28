@@ -4,11 +4,16 @@ This repo contains Pluto notebooks of my maths musings!
 
 ### Few demos
 
+#### Fourier approximation
+
 ![](./demo/demo.gif)
 
 
+#### Seam carving
+
 ![](./demo/demo2.gif)
 
+#### Convolution
 
 ![](./demo/demo3.gif)
 
