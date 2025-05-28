@@ -2,7 +2,12 @@
 
 This repo contains Pluto notebooks of my maths musings! 
 
+### Few demos
+
 ![](./demo/demo.gif)
+
+
+![](./demo/demo2.gif)
 
 ### How to view?
 
